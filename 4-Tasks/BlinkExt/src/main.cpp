@@ -19,7 +19,10 @@
 #define TASK_PRIORITY		( tskIDLE_PRIORITY + 1UL )
 
 //LED PAD to use
-#define LED_PAD				0
+#define LED_PAD				1
+
+//DRAME SOLO
+//F14218806
 
 
 void runTimeStats(   ){
