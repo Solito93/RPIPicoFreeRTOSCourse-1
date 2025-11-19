@@ -1,8 +1,4 @@
-Sure! Here’s a more concise version in English:
 
----
-
-### Changes Made
 
 1. **LED Pin Change (`LED_PAD`)**
 
