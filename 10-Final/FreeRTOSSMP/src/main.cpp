@@ -1,5 +1,5 @@
 /***
- * Demo program to light 4 LEDs as binary random value.
+ * Demo program to light 4 LEDs as binary random value
  * Uses FreeRTOS Task
  * Jon Durrant
  * 15-Aug-2022
@@ -15,6 +15,7 @@
 
 #include "BlinkAgent.h"
 #include "CounterAgent.h"
+#include "DecoderAgent.h"
 
 
 //Standard Task priority
@@ -87,20 +88,26 @@ void runTimeStats(   ){
  * @param params - unused
  */
 void mainTask(void *params){
+    char line[80];
     BlinkAgent blink(LED_PAD);
-    CounterAgent counter(LED1_PAD, LED2_PAD, LED3_PAD, LED4_PAD,  LED5_PAD, LED6_PAD, LED7_PAD, LED8_PAD);
+    CounterAgent counter(LED1_PAD, LED2_PAD, LED3_PAD, LED4_PAD, LED5_PAD, LED6_PAD, LED7_PAD, LED8_PAD);
+    DecoderAgent decoder(&counter);
 
     printf("Main task started\n");
 
     blink.start("Blink", TASK_PRIORITY);
     counter.start("Counter", TASK_PRIORITY);
+    decoder.start("Decode", TASK_PRIORITY);
 
     while (true) { // Loop forever
         runTimeStats();
-        uint8_t r = rand() & 0x0F;
-        counter.on(r);
-        printf("Count R=0x%X\n", r);
+        uint16_t r = rand() & 0x0FF;
+
+        sprintf(line, "{\"count\": %d}\r\n", r);
+        printf("Providing Json %s\n", line);
+        decoder.add(line);
         vTaskDelay(3000);
+    printf("DRAME SOLO F14218806");
     }
 }
 
