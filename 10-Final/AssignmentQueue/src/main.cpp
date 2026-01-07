@@ -1,5 +1,5 @@
 /***
- * Demo program to light 4 LEDs as binary random value
+ * Demo program to light 4 LEDs as binary random value.
  * Uses FreeRTOS Task
  * Jon Durrant
  * 15-Aug-2022
@@ -18,20 +18,24 @@
 
 
 //Standard Task priority
-#define TASK_PRIORITY		( tskIDLE_PRIORITY + 1UL )
+#define TASK_PRIORITY       ( tskIDLE_PRIORITY + 1UL )
 
 //LED PAD to use
-#define LED_PAD				0
-#define LED1_PAD			2
-#define LED2_PAD			3
-#define LED3_PAD			4
-#define LED4_PAD			5
+#define LED_PAD             0
+#define LED1_PAD            2
+#define LED2_PAD            3
+#define LED3_PAD            4
+#define LED4_PAD            5
+#define LED5_PAD            6
+#define LED6_PAD            7
+#define LED7_PAD            8
+#define LED8_PAD            9
 
 
 void runTimeStats(   ){
-	TaskStatus_t *pxTaskStatusArray;
-	volatile UBaseType_t uxArraySize, x;
-	unsigned long ulTotalRunTime;
+    TaskStatus_t *pxTaskStatusArray;
+    volatile UBaseType_t uxArraySize, x;
+    unsigned long ulTotalRunTime;
 
 
    // Get number of takss
@@ -47,34 +51,34 @@ void runTimeStats(   ){
                                  uxArraySize,
                                  &ulTotalRunTime );
 
-	 // Print stats
-	 for( x = 0; x < uxArraySize; x++ )
-	 {
-		 printf("Task: %d \t cPri:%d \t bPri:%d \t hw:%d \t%s\n",
-				pxTaskStatusArray[ x ].xTaskNumber ,
-				pxTaskStatusArray[ x ].uxCurrentPriority ,
-				pxTaskStatusArray[ x ].uxBasePriority ,
-				pxTaskStatusArray[ x ].usStackHighWaterMark ,
-				pxTaskStatusArray[ x ].pcTaskName
-				);
-	 }
+     // Print stats
+     for( x = 0; x < uxArraySize; x++ )
+     {
+         printf("Task: %d \t cPri:%d \t bPri:%d \t hw:%d \t%s\n",
+                pxTaskStatusArray[ x ].xTaskNumber ,
+                pxTaskStatusArray[ x ].uxCurrentPriority ,
+                pxTaskStatusArray[ x ].uxBasePriority ,
+                pxTaskStatusArray[ x ].usStackHighWaterMark ,
+                pxTaskStatusArray[ x ].pcTaskName
+                );
+     }
 
 
       // Free array
       vPortFree( pxTaskStatusArray );
    } else {
-	   printf("Failed to allocate space for stats\n");
+       printf("Failed to allocate space for stats\n");
    }
 
    //Get heap allocation information
    HeapStats_t heapStats;
    vPortGetHeapStats(&heapStats);
    printf("HEAP avl: %d, blocks %d, alloc: %d, free: %d\n",
-		   heapStats.xAvailableHeapSpaceInBytes,
-		   heapStats.xNumberOfFreeBlocks,
-		   heapStats.xNumberOfSuccessfulAllocations,
-		   heapStats.xNumberOfSuccessfulFrees
-		   );
+           heapStats.xAvailableHeapSpaceInBytes,
+           heapStats.xNumberOfFreeBlocks,
+           heapStats.xNumberOfSuccessfulAllocations,
+           heapStats.xNumberOfSuccessfulFrees
+           );
 }
 
 
@@ -83,21 +87,21 @@ void runTimeStats(   ){
  * @param params - unused
  */
 void mainTask(void *params){
-	BlinkAgent blink(LED_PAD);
-	CounterAgent counter(LED1_PAD, LED2_PAD, LED3_PAD, LED4_PAD);
+    BlinkAgent blink(LED_PAD);
+    CounterAgent counter(LED1_PAD, LED2_PAD, LED3_PAD, LED4_PAD,  LED5_PAD, LED6_PAD, LED7_PAD, LED8_PAD);
 
-	printf("Main task started\n");
+    printf("Main task started\n");
 
-	blink.start("Blink", TASK_PRIORITY);
-	counter.start("Counter", TASK_PRIORITY);
+    blink.start("Blink", TASK_PRIORITY);
+    counter.start("Counter", TASK_PRIORITY);
 
-	while (true) { // Loop forever
-		runTimeStats();
-		uint8_t r = rand() & 0x0F;
-		counter.blink(r);
-		printf("Blinking R=0x%X\n", r);
-		vTaskDelay(3000);
-	}
+    while (true) { // Loop forever
+        runTimeStats();
+        uint8_t r = rand() & 0x0F;
+        counter.on(r);
+        printf("Count R=0x%X\n", r);
+        vTaskDelay(3000);
+    }
 }
 
 
@@ -108,7 +112,7 @@ void mainTask(void *params){
  */
 void vLaunch( void) {
 
-	//Start blink task
+    //Start blink task
     TaskHandle_t task;
     xTaskCreate(mainTask, "MainThread", 500, NULL, TASK_PRIORITY, &task);
 
@@ -122,7 +126,7 @@ void vLaunch( void) {
  */
 int main( void )
 {
-	//Setup serial over USB and give a few seconds to settle before we start
+    //Setup serial over USB and give a few seconds to settle before we start
     stdio_init_all();
     sleep_ms(2000);
     printf("GO\n");
